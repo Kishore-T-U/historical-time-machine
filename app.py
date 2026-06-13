@@ -204,20 +204,19 @@ with st.sidebar:
     st.caption("Create a new instance of a character to discuss a new topic!")
     with st.form("new_persona_form"):
         new_name = st.text_input("Name (e.g., Nikola Tesla) *Required")
-        new_topic = st.text_input("Topic/Session Name (e.g., Radio Waves) *Required")
+        new_topic = st.text_input("Topic/Session Name *Required")
+        # Add this line back in!
+        custom_image = st.text_input("Image URL (Optional - paste here to override auto-search)")
         
         submitted = st.form_submit_button("Open New Timeline!")
         
-        # Change this block in your app.py
-        if submitted and new_name:
-            # If user left the topic blank, use a default
-            topic_label = new_topic.strip() if new_topic.strip() else "General Exploration"
-            timeline_key = f"{new_name} ({topic_label})" 
+        if submitted and new_name and new_topic:
+            timeline_key = f"{new_name} ({new_topic})"
             
             with st.spinner(f"Searching the timeline for {new_name}..."):
-                # ... (rest of the code remains exactly the same)
-                final_image = get_wikipedia_image(new_name)
-                
+                # If custom_image is provided, use it; otherwise, use auto-search
+                final_image = custom_image.strip() if custom_image.strip() else get_wikipedia_image(new_name)
+            
                 # Auto-fill using AI
                 try:
                     client = OpenAI(
