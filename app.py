@@ -9,35 +9,41 @@ st.set_page_config(page_title="Historical Time Machine", page_icon="⏳", layout
 # Inject Custom CSS for an "Ancient/Vintage" look
 st.markdown("""
 <style>
-    /* Vintage parchment background */
+    /* 1. Base Vintage Background */
     .stApp {
         background-color: #f4ecd8;
         background-image: url("https://www.transparenttextures.com/patterns/aged-paper.png");
         font-family: 'Georgia', serif !important;
-        color: #2b1b17;
-    }
-    
-    /* FIX: Force Chat Bubbles to be dark with light text */
-    [data-testid="stChatMessage"] {
-        background-color: #2b1b17 !important; /* Dark charcoal */
-        color: #f4ecd8 !important;           /* Creamy white text */
-        border-radius: 10px;
-        padding: 10px;
-    }
-    
-    /* Style the text inside bubbles */
-    [data-testid="stChatMessage"] p {
-        color: #f4ecd8 !important;
     }
 
+    /* 2. FORCE All Text to be Dark Ink (Fixes the invisible mobile text) */
+    .stApp p, .stApp div, .stApp span, .stApp label, .stApp li {
+        color: #2b1b17 !important; 
+    }
+    
     h1, h2, h3 {
         font-family: 'Georgia', serif !important;
         color: #3e2723 !important;
     }
-    
+
+    /* 3. Restore the Classy Chat Look (Removes the ugly dark boxes) */
+    [data-testid="stChatMessage"] {
+        background-color: transparent !important; 
+        border-bottom: 1px solid #d7ccc8; /* Adds a subtle, classy separator line between messages */
+        padding-top: 15px;
+        padding-bottom: 15px;
+    }
+
+    /* 4. Style the Sidebar */
     [data-testid="stSidebar"] {
         background-color: #e6dfcc;
         border-right: 2px solid #8d6e63;
+    }
+
+    /* 5. Vintage Chat Input Box at the bottom */
+    [data-testid="stChatInput"] {
+        background-color: #e6dfcc !important;
+        border: 1px solid #8d6e63 !important;
     }
 </style>
 """, unsafe_allow_html=True)
