@@ -9,19 +9,32 @@ st.set_page_config(page_title="Historical Time Machine", page_icon="⏳", layout
 # Inject Custom CSS for an "Ancient/Vintage" look
 st.markdown("""
 <style>
-    /* Vintage parchment background pattern */
+    /* Vintage parchment background */
     .stApp {
         background-color: #f4ecd8;
         background-image: url("https://www.transparenttextures.com/patterns/aged-paper.png");
         font-family: 'Georgia', serif !important;
         color: #2b1b17;
     }
-    /* Make headers match the theme */
+    
+    /* FIX: Force Chat Bubbles to be dark with light text */
+    [data-testid="stChatMessage"] {
+        background-color: #2b1b17 !important; /* Dark charcoal */
+        color: #f4ecd8 !important;           /* Creamy white text */
+        border-radius: 10px;
+        padding: 10px;
+    }
+    
+    /* Style the text inside bubbles */
+    [data-testid="stChatMessage"] p {
+        color: #f4ecd8 !important;
+    }
+
     h1, h2, h3 {
         font-family: 'Georgia', serif !important;
         color: #3e2723 !important;
     }
-    /* Style the sidebar to look like a leather binding */
+    
     [data-testid="stSidebar"] {
         background-color: #e6dfcc;
         border-right: 2px solid #8d6e63;
