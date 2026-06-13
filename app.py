@@ -126,10 +126,14 @@ with st.sidebar:
         
         submitted = st.form_submit_button("Open New Timeline!")
         
-        if submitted and new_name and new_topic:
-            timeline_key = f"{new_name} ({new_topic})" # Creates a unique key like "Nikola Tesla (Radio Waves)"
+        # Change this block in your app.py
+        if submitted and new_name:
+            # If user left the topic blank, use a default
+            topic_label = new_topic.strip() if new_topic.strip() else "General Exploration"
+            timeline_key = f"{new_name} ({topic_label})" 
             
             with st.spinner(f"Searching the timeline for {new_name}..."):
+                # ... (rest of the code remains exactly the same)
                 final_image = get_wikipedia_image(new_name)
                 
                 # Auto-fill using AI
