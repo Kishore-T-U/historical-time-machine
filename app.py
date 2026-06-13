@@ -319,15 +319,15 @@ if prompt := st.chat_input(f"Teach {char_info['base_name']} something new..."):
                 temperature=0.7,
                 max_tokens=1000
             )
-        full_response = response.choices[0].message.content
-        message_placeholder.markdown(full_response)
+            full_response = response.choices[0].message.content
+            message_placeholder.markdown(full_response)
+            
+            if st.session_state.messages.get(active_timeline) is None:
+                 st.session_state.messages[active_timeline] = []
+            # ----------------------------------
 
-        if st.session_state.messages.get(active_timeline) is None:
-            st.session_state.messages[active_timeline] = []
-        # ----------------------------------
-
-        st.session_state.messages[active_timeline].append({"role": "assistant", "content": full_response})
-        save_history(st.session_state.messages)
+            st.session_state.messages[active_timeline].append({"role": "assistant", "content": full_response})
+            save_history(st.session_state.messages)
         except Exception as e:
                   # This will print the real technical reason for the crash
                   st.error(f"Timeline disruption! Real Error: {e}")
