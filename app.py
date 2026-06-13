@@ -98,17 +98,37 @@ st.write("Summon historical figures and explore different timelines!")
 
 # 2. Wikipedia Image Fetcher
 def get_wikipedia_image(person_name):
+    # A dictionary of your "Golden Path" characters
+    golden_characters = {
+        "Sherlock Holmes": "https://upload.wikimedia.org/wikipedia/commons/b/b5/Sherlock_Holmes_portrait.jpg",
+        "Sun Wukong": "https://upload.wikimedia.org/wikipedia/commons/e/e0/Sun_Wukong.jpg",
+        "Isaac Newton": "https://upload.wikimedia.org/wikipedia/commons/3/3b/Portrait_of_Sir_Isaac_Newton%2C_1689.jpg"
+    }
+    
+    # Check if the character is in your curated list
+    if person_name in golden_characters:
+        return golden_characters[person_name]
+    
+    # Otherwise, run your normal logic...
     try:
+        # ... (rest of the Wikipedia search code)
+        # 1. Attempt to get from Wikipedia
         search_name = person_name.replace(" ", "_")
         url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{search_name}"
-        headers = {"User-Agent": "HistoricalTimeMachine/2.0 (Hackathon Project)"}
+        headers = {"User-Agent": "HistoricalTimeMachine/2.0 (Hackathon)"}
         response = requests.get(url, headers=headers).json()
-        if "thumbnail" in response:
+        
+        if "thumbnail" in response and "source" in response["thumbnail"]:
             return response["thumbnail"]["source"]
+        
+        # 2. FALLBACK for fictional characters
+        # If Wikipedia fails, use a generic "Legendary/Storybook" avatar
+        # You can change this URL to any icon you prefer
+        return "https://cdn-icons-png.flaticon.com/512/2809/2809636.png"
+        
     except Exception:
-        pass
-    return "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"
-
+        return "https://cdn-icons-png.flaticon.com/512/2809/2809636.png"
+        
 # 3. Initialize Session State (Memory)
 if "personas" not in st.session_state:
     # Notice we now store the 'base_name' so the AI knows who it is, even if the timeline has a custom topic!
