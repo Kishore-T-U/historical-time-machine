@@ -4,8 +4,16 @@ import requests
 import json  # ADDED: For saving data
 from openai import OpenAI
 
-# --- NEW: Permanent Save Functions ---
-SAVE_FILE = "time_machine_history.json"
+# --- NEW: Check who is logged in to make data private ---
+try:
+    # Grabs the email of the person currently looking at the app
+    current_user = st.experimental_user.email
+except:
+    # Fallback just in case you run it locally on your Windows laptop
+    current_user = "local_user"
+
+# Create a completely separate database file for every unique email
+SAVE_FILE = f"time_machine_{current_user}.json"
 
 def load_history():
     """Loads the chat history from a local file if it exists."""
