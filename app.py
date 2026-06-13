@@ -179,7 +179,12 @@ with st.sidebar:
     # ---------------------------------------------------------
     # NEW FEATURE: Export Chat Log
     # ---------------------------------------------------------
-    chat_history = st.session_state.messages[selected_character]
+    # ADD THIS SAFETY CHECK: If the character isn't in memory yet, create a blank list
+        if selected_character not in st.session_state.messages:
+            st.session_state.messages[selected_character] = []
+
+        # Now it is perfectly safe to pull the chat history! (Your original line 182)
+        chat_history = st.session_state.messages[selected_character]
     if chat_history:
         # Format the chat into a readable text document
         export_text = f"--- Timeline: {selected_character} ---\n\n"
