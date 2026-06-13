@@ -210,11 +210,14 @@ with st.sidebar:
         
         submitted = st.form_submit_button("Open New Timeline!")
         
-        if submitted and new_name and new_topic:
-            timeline_key = f"{new_name} ({new_topic})"
+        # We only require the name now to trigger the logic
+        if submitted and new_name:
+            # If user left the topic blank, default to "General Exploration"
+            topic_label = new_topic.strip() if new_topic.strip() else "General Exploration"
+            timeline_key = f"{new_name} ({topic_label})"
             
             with st.spinner(f"Searching the timeline for {new_name}..."):
-                # If custom_image is provided, use it; otherwise, use auto-search
+                # Use custom image if provided, otherwise auto-search
                 final_image = custom_image.strip() if custom_image.strip() else get_wikipedia_image(new_name)
             
                 # Auto-fill using AI
