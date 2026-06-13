@@ -21,7 +21,7 @@ def get_wikipedia_image(name):
         for page_id in pages:
             if 'thumbnail' in pages[page_id]:
                 return pages[page_id]['thumbnail']['source']
-    except Exception as e:
+    except Exception:
         pass
     # Fallback image if Wikipedia doesn't have a portrait
     return "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"
@@ -46,7 +46,39 @@ if "messages" not in st.session_state:
     st.session_state.messages = {name: [] for name in st.session_state.personas}
 
 # 4. Sidebar UI
-# Summon New Character Form
+with st.sidebar:
+    st.header("🕰️ Timeline Control")
+    
+    # Character Selection
+    selected_character = st.selectbox(
+        "Who are you talking to?", 
+        options=list(st.session_state.personas.keys())
+    )
+    
+    # Display Character Profile
+    char_info = st.session_state.personas[selected_character]
+    st.image(char_info["image"], use_container_width=True)
+    st.subheader(selected_character)
+    st.caption(char_info["dates"])
+    st.write(char_info["bio"])
+    
+    # Delete Persona Button (Only show for custom characters)
+    if selected_character not in ["Isaac Newton", "Ada Lovelace"]:
+        if st.button(f"🗑️ Delete {selected_character}", type="primary", use_container_width=True):
+            del st.session_state.personas[selected_character]
+            if selected_character in st.session_state.messages:
+                del st.session_state.messages[selected_character]
+            st.success(f"{selected_character} erased from timeline!")
+            st.rerun()
+
+    # Clear Chat Button
+    if st.button("🧹 Clear Current Chat", use_container_width=True):
+        st.session_state.messages[selected_character] = []
+        st.rerun()
+        
+    st.divider()
+    
+    # Summon New Character Form (AI AUTO-FILL VERSION)
     st.header("⚡ Summon Someone New")
     st.caption("Just type a name. Leave the rest blank to let the AI auto-fill it!")
     with st.form("new_persona_form"):
@@ -107,37 +139,6 @@ if "messages" not in st.session_state:
                 st.success(f"Successfully summoned {new_name}!")
                 st.rerun()
 
-    # Clear Chat Button
-    if st.button("🧹 Clear Current Chat", use_container_width=True):
-        st.session_state.messages[selected_character] = []
-        st.rerun()
-        
-    st.divider()
-    
-    # Summon New Character Form
-    st.header("⚡ Summon Someone New")
-    with st.form("new_persona_form"):
-        new_name = st.text_input("Name (e.g., Marie Curie)")
-        new_dates = st.text_input("Dates (e.g., 1867-1934)")
-        new_bio = st.text_area("Brief Bio")
-        new_image = st.text_input("Image URL (Leave blank to auto-fetch from Wikipedia!)")
-        
-        submitted = st.form_submit_button("Bring them to life!")
-        if submitted and new_name:
-            # Auto-fetch image if left blank
-            final_image = new_image if new_image.strip() else get_wikipedia_image(new_name)
-            
-            # Save to memory
-            st.session_state.personas[new_name] = {
-                "dates": new_dates,
-                "bio": new_bio,
-                "image": final_image
-            }
-            if new_name not in st.session_state.messages:
-                st.session_state.messages[new_name] = []
-            st.success(f"Summoned {new_name}!")
-            st.rerun()
-
 # 5. Main Chat Interface
 st.header(f"Chatting with {selected_character}")
 
@@ -164,17 +165,25 @@ if prompt := st.chat_input(f"Teach {selected_character} something new..."):
                 api_key=os.environ.get("GITHUB_TOKEN")
             )
             
+            # Extract the death year dynamically for the prompt
+            death_year = "your time"
+            if "–" in char_info['dates']:
+                death_year = char_info['dates'].split('–')[-1].strip()
+            elif "-" in char_info['dates']:
+                death_year = char_info['dates'].split('-')[-1].strip()
+
+            # The Strict System Prompt
             system_prompt = f"""
             You are strictly {selected_character}. 
             Your biography: {char_info['bio']}. 
             You lived during {char_info['dates']}. 
             
             CRITICAL INSTRUCTIONS:
-            1. You have absolutely no knowledge of any events, people, discoveries, or technology that occurred after your death in {char_info['dates'].split('–')[-1].strip()}.
+            1. You have absolutely no knowledge of any events, people, discoveries, or technology that occurred after your death in {death_year}.
             2. If a user asks you about someone like Albert Einstein, quantum mechanics, or modern technology, you must respond with confusion, stating that you have never heard of these things. 
             3. You must act exactly as this person would. Do not break character.
             4. Use analogies only from your own time period.
-            5. Respond with curiosity and stay strictly in the persona of a person living in the {char_info['dates'].split('–')[0][:3]}00s.
+            5. Respond with curiosity and stay strictly in the persona of a person living in your era.
             """
             
             messages_for_api = [{"role": "system", "content": system_prompt}]
