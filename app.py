@@ -316,6 +316,7 @@ if prompt := st.chat_input(f"Teach {char_info['base_name']} something new..."):
             2. If asked about modern topics, respond with confusion.
             3. You must act exactly as {char_info['base_name']} would. Do not break character.
             4. Use analogies only from your own time period.
+            5. FORMATTING: You MUST use $ for inline math (e.g., $y = mx + c$) and $$ for block math. Do not use brackets or parentheses to enclose equations.
             """
             
             messages_for_api = [{"role": "system", "content": system_prompt}]
