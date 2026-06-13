@@ -1,13 +1,24 @@
 import streamlit as st
 import os
 import requests
+import json  # ADDED: For saving data
 from openai import OpenAI
-from streamlit_cookies_controller import CookieController
 
-controller = CookieController()
-# Save to cookie every time the message state changes
-if "messages" in st.session_state:
-    controller.set("chat_history", st.session_state.messages)
+# --- NEW: Permanent Save Functions ---
+SAVE_FILE = "time_machine_history.json"
+
+def load_history():
+    """Loads the chat history from a local file if it exists."""
+    if os.path.exists(SAVE_FILE):
+        with open(SAVE_FILE, "r") as f:
+            return json.load(f)
+    return {} 
+
+def save_history(history_dict):
+    """Saves the current chat history to a local file."""
+    with open(SAVE_FILE, "w") as f:
+        json.dump(history_dict, f, indent=4)
+# -------------------------------------
 
 # 1. Page Configuration & Custom Vintage Theme
 st.set_page_config(page_title="Historical Time Machine", page_icon="⏳", layout="wide")
@@ -148,7 +159,7 @@ if "personas" not in st.session_state:
     }
 
 if "messages" not in st.session_state:
-    st.session_state.messages = {name: [] for name in st.session_state.personas}
+    st.session_state.messages = load_history()
 
 # 4. Sidebar UI
 with st.sidebar:
@@ -307,7 +318,8 @@ if prompt := st.chat_input(f"Teach {char_info['base_name']} something new..."):
             full_response = response.choices[0].message.content
             message_placeholder.markdown(full_response)
             
-            st.session_state.messages[selected_character].append({"role": "assistant", "content": full_response})
-            
+        st.session_state.messages[active_timeline].append({"role": "assistant", "content": full_response})
+        
+        save_history(st.session_state.messages)
         except Exception as e:
             st.error("Timeline disruption! Make sure your GITHUB_TOKEN is set in Streamlit Secrets.")
