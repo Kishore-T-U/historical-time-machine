@@ -334,8 +334,25 @@ if prompt := st.chat_input(f"Teach {char_info['base_name']} something new..."):
             if st.session_state.messages.get(selected_character) is None:
                    st.session_state.messages[selected_character] = []
 
-        # APPEND AND SAVE
-            st.session_state.messages[selected_character].append({"role": "assistant", "content": full_response})
-            save_history(st.session_state.messages)
-        except Exception as e:
-                  st.error(f"Timeline disruption! Real Error: {e}")
+        # SAFETY CHECK: Make sure we use 'selected_character' 
+        if st.session_state.messages.get(selected_character) is None:
+            st.session_state.messages[selected_character] = []
+
+        # 1. APPEND TO TEMPORARY RAM (This allows the chat and download button to work)
+        st.session_state.messages[selected_character].append({"role": "assistant", "content": full_response})
+        
+        # 2. FILTER BEFORE SAVING (This blocks Newton and Ada from the JSON file)
+        impermanent_timelines = ["Isaac Newton (Calculus)", "Ada Lovelace (Engines)"]
+        
+        messages_to_save = {
+            timeline: chat_log 
+            for timeline, chat_log in st.session_state.messages.items() 
+            if timeline not in impermanent_timelines
+        }
+        
+        # 3. SAVE ONLY THE FILTERED MESSAGES
+        save_history(messages_to_save)
+
+    except Exception as e:
+        # Fixed the missing quotes and parenthesis here!
+        st.error(f"Timeline disruption! Real Error: {e}")
