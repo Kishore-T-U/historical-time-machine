@@ -16,8 +16,8 @@ st.markdown("""
         font-family: 'Georgia', serif !important;
     }
 
-    /* 2. FORCE All Text to be Dark Ink (Fixes the invisible mobile text) */
-    .stApp p, .stApp div, .stApp span, .stApp label, .stApp li {
+    /* 2. FORCE Base Text to be Dark Ink */
+    .stApp p, .stApp span, .stApp label, .stApp li {
         color: #2b1b17 !important; 
     }
     
@@ -26,24 +26,42 @@ st.markdown("""
         color: #3e2723 !important;
     }
 
-    /* 3. Restore the Classy Chat Look (Removes the ugly dark boxes) */
-    [data-testid="stChatMessage"] {
-        background-color: transparent !important; 
-        border-bottom: 1px solid #d7ccc8; /* Adds a subtle, classy separator line between messages */
-        padding-top: 15px;
-        padding-bottom: 15px;
+    /* 3. FIX THE DROPDOWN BOXES (Make them parchment-colored) */
+    div[data-baseweb="select"] > div {
+        background-color: #f4ecd8 !important;
+        border: 1px solid #8d6e63 !important;
+        color: #2b1b17 !important;
+    }
+    /* Fix the dropdown menu popup list */
+    div[data-baseweb="popover"] div {
+        background-color: #f4ecd8 !important;
+        color: #2b1b17 !important;
     }
 
-    /* 4. Style the Sidebar */
+    /* 4. The Upgraded "Vintage Stationary" Chat Look */
+    [data-testid="stChatMessage"] {
+        background-color: #ede6d3 !important; /* A slightly lighter parchment color for the card */
+        border: 1px solid #cbbba0 !important; /* A classy, soft ink border around the whole box */
+        border-radius: 10px !important;       /* Soft, rounded corners */
+        margin-bottom: 15px !important;       /* Clean spacing between messages */
+        padding: 15px !important;
+        box-shadow: 2px 2px 5px rgba(43, 27, 23, 0.08) !important; /* A very faint shadow for depth */
+    }
+
+    /* 5. Style the Sidebar */
     [data-testid="stSidebar"] {
         background-color: #e6dfcc;
         border-right: 2px solid #8d6e63;
     }
 
-    /* 5. Vintage Chat Input Box at the bottom */
+    /* 6. Fix Chat Input and Buttons */
     [data-testid="stChatInput"] {
         background-color: #e6dfcc !important;
         border: 1px solid #8d6e63 !important;
+    }
+    /* Keep button text light so it is readable against dark buttons */
+    .stButton > button p {
+        color: #f4ecd8 !important; 
     }
 </style>
 """, unsafe_allow_html=True)
