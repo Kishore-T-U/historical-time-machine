@@ -353,6 +353,6 @@ if prompt := st.chat_input(f"Teach {char_info['base_name']} something new..."):
         # 3. SAVE ONLY THE FILTERED MESSAGES
             save_history(messages_to_save)
 
-    except Exception as e:
+        except Exception as e:
         # Fixed the missing quotes and parenthesis here!
-        st.error(f"Timeline disruption! Real Error: {e}")
+            st.error(f"Timeline disruption! Real Error: {e}")
