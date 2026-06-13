@@ -59,27 +59,28 @@ st.markdown("""
         border: 1px solid #8d6e63 !important;
     }
 
-    /* 7. FIX: Mobile Header & Sidebar Expander Icon */
+    /* 7. FIX: Header & Bottom Chat Background Blocks */
     [data-testid="stHeader"] {
-        background-color: rgba(244, 236, 216, 0.95) !important; /* Make mobile header parchment colored */
+        background-color: transparent !important; 
+    }
+    [data-testid="stBottom"] > div {
+        background-color: transparent !important; 
     }
     [data-testid="collapsedControl"] svg, [data-testid="collapsedControl"] {
-        color: #2b1b17 !important; /* Force the > icon to be dark ink */
+        color: #2b1b17 !important; 
         fill: #2b1b17 !important;
     }
 
-    /* 8. FIX: Button Colors (Primary vs Secondary) */
-    /* Primary buttons (Delete Timeline) */
+    /* 8. FIX: Button Colors */
     .stButton > button[kind="primary"] p {
-        color: #f4ecd8 !important; /* Light text on the red background */
+        color: #f4ecd8 !important; 
     }
-    /* Secondary buttons (Clear Chat) */
     .stButton > button[kind="secondary"] {
         background-color: #e6dfcc !important;
         border: 1px solid #8d6e63 !important;
     }
     .stButton > button[kind="secondary"] p {
-        color: #2b1b17 !important; /* Dark ink text on the light background */
+        color: #2b1b17 !important; 
     }
 </style>
 """, unsafe_allow_html=True)
