@@ -326,4 +326,5 @@ if prompt := st.chat_input(f"Teach {char_info['base_name']} something new..."):
             st.session_state.messages[active_timeline].append({"role": "assistant", "content": full_response})
             save_history(st.session_state.messages)
         except Exception as e:
-            st.error("Timeline disruption! Make sure your GITHUB_TOKEN is set in Streamlit Secrets.")
+                  # This will print the real technical reason for the crash
+                  st.error(f"Timeline disruption! Real Error: {e}")
