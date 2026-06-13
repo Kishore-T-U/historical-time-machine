@@ -318,8 +318,7 @@ if prompt := st.chat_input(f"Teach {char_info['base_name']} something new..."):
             full_response = response.choices[0].message.content
             message_placeholder.markdown(full_response)
             
-        st.session_state.messages[active_timeline].append({"role": "assistant", "content": full_response})
-        
-        save_history(st.session_state.messages)
+            st.session_state.messages[active_timeline].append({"role": "assistant", "content": full_response})
+            save_history(st.session_state.messages)
         except Exception as e:
             st.error("Timeline disruption! Make sure your GITHUB_TOKEN is set in Streamlit Secrets.")
