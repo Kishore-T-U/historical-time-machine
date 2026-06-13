@@ -2,6 +2,12 @@ import streamlit as st
 import os
 import requests
 from openai import OpenAI
+from streamlit_cookies_controller import CookieController
+
+controller = CookieController()
+# Save to cookie every time the message state changes
+if "messages" in st.session_state:
+    controller.set("chat_history", st.session_state.messages)
 
 # 1. Page Configuration & Custom Vintage Theme
 st.set_page_config(page_title="Historical Time Machine", page_icon="⏳", layout="wide")
