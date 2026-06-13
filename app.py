@@ -26,26 +26,25 @@ st.markdown("""
         color: #3e2723 !important;
     }
 
-    /* 3. FIX THE DROPDOWN BOXES (Make them parchment-colored) */
+    /* 3. FIX THE DROPDOWN BOXES */
     div[data-baseweb="select"] > div {
         background-color: #f4ecd8 !important;
         border: 1px solid #8d6e63 !important;
         color: #2b1b17 !important;
     }
-    /* Fix the dropdown menu popup list */
     div[data-baseweb="popover"] div {
         background-color: #f4ecd8 !important;
         color: #2b1b17 !important;
     }
 
-    /* 4. The Upgraded "Vintage Stationary" Chat Look */
+    /* 4. Vintage Stationary Chat Look */
     [data-testid="stChatMessage"] {
-        background-color: #ede6d3 !important; /* A slightly lighter parchment color for the card */
-        border: 1px solid #cbbba0 !important; /* A classy, soft ink border around the whole box */
-        border-radius: 10px !important;       /* Soft, rounded corners */
-        margin-bottom: 15px !important;       /* Clean spacing between messages */
+        background-color: #ede6d3 !important; 
+        border: 1px solid #cbbba0 !important; 
+        border-radius: 10px !important;       
+        margin-bottom: 15px !important;       
         padding: 15px !important;
-        box-shadow: 2px 2px 5px rgba(43, 27, 23, 0.08) !important; /* A very faint shadow for depth */
+        box-shadow: 2px 2px 5px rgba(43, 27, 23, 0.08) !important; 
     }
 
     /* 5. Style the Sidebar */
@@ -54,14 +53,33 @@ st.markdown("""
         border-right: 2px solid #8d6e63;
     }
 
-    /* 6. Fix Chat Input and Buttons */
+    /* 6. Fix Chat Input */
     [data-testid="stChatInput"] {
         background-color: #e6dfcc !important;
         border: 1px solid #8d6e63 !important;
     }
-    /* Keep button text light so it is readable against dark buttons */
-    .stButton > button p {
-        color: #f4ecd8 !important; 
+
+    /* 7. FIX: Mobile Header & Sidebar Expander Icon */
+    [data-testid="stHeader"] {
+        background-color: rgba(244, 236, 216, 0.95) !important; /* Make mobile header parchment colored */
+    }
+    [data-testid="collapsedControl"] svg, [data-testid="collapsedControl"] {
+        color: #2b1b17 !important; /* Force the > icon to be dark ink */
+        fill: #2b1b17 !important;
+    }
+
+    /* 8. FIX: Button Colors (Primary vs Secondary) */
+    /* Primary buttons (Delete Timeline) */
+    .stButton > button[kind="primary"] p {
+        color: #f4ecd8 !important; /* Light text on the red background */
+    }
+    /* Secondary buttons (Clear Chat) */
+    .stButton > button[kind="secondary"] {
+        background-color: #e6dfcc !important;
+        border: 1px solid #8d6e63 !important;
+    }
+    .stButton > button[kind="secondary"] p {
+        color: #2b1b17 !important; /* Dark ink text on the light background */
     }
 </style>
 """, unsafe_allow_html=True)
