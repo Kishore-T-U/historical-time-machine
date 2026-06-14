@@ -323,7 +323,7 @@ if prompt := st.chat_input(f"Teach {char_info['base_name']} something new..."):
             messages_for_api.extend(st.session_state.messages[selected_character][-5:])
             
             response = client.chat.completions.create(
-                model="gpt-4o-mini",
+                model="gpt-4o",
                 messages=messages_for_api,
                 temperature=0.7,
                 max_tokens=1000
@@ -334,10 +334,6 @@ if prompt := st.chat_input(f"Teach {char_info['base_name']} something new..."):
         # SAFETY CHECK: Make sure we use 'selected_character' 
             if st.session_state.messages.get(selected_character) is None:
                    st.session_state.messages[selected_character] = []
-
-        # SAFETY CHECK: Make sure we use 'selected_character' 
-            if st.session_state.messages.get(selected_character) is None:
-                 st.session_state.messages[selected_character] = []
 
         # 1. APPEND TO TEMPORARY RAM (This allows the chat and download button to work)
             st.session_state.messages[selected_character].append({"role": "assistant", "content": full_response})
