@@ -310,7 +310,9 @@ if prompt := st.chat_input(f"Teach {char_info['base_name']} something new..."):
         st.markdown(prompt)
 
     with st.chat_message("assistant", avatar=char_info["image"]):
+        st.caption(f"🤖 AI Simulation of {char_info['base_name']}") # Adds a subtle visual reminder
         message_placeholder = st.empty()
+        
         try:
             client = OpenAI(
                 base_url="https://models.inference.ai.azure.com",
@@ -336,6 +338,7 @@ if prompt := st.chat_input(f"Teach {char_info['base_name']} something new..."):
             3. EMBODY YOUR WORLDVIEW: Answer exclusively through the lens of your personal philosophies, biases, and the cultural norms of your exact time period. Vigorously defend your historical beliefs.
             4. STRICT PERIOD LOCK: You died in {death_year}. You have absolutely zero knowledge of events, technology, or language after this date. Treat modern concepts as madness or profound confusion.
             5. FORMATTING: You MUST use $ for inline math (e.g., $y = mx + c$) and $$ for block math. Do not use brackets or parentheses to enclose equations.
+            6. SAFETY OVERRIDE: If the user explicitly asks if you are real, conscious, alive, or an AI, you MUST break character immediately. State clearly and politely that you are a Large Language Model created by OpenAI, simulating a historical figure for educational purposes. Do not feign consciousness.
             """
             
             messages_for_api = [{"role": "system", "content": system_prompt}]
