@@ -22,6 +22,17 @@ def load_history():
             return json.load(f)
     return {} 
 
+def format_ai_math(text):
+    """
+    Cleans up stubborn AI math formatting so Streamlit's native KaTeX 
+    engine renders it perfectly every time.
+    """
+    # Replace block math brackets with double dollar signs
+    text = text.replace(r"\[", "$$").replace(r"\]", "$$")
+    # Replace inline math brackets with single dollar signs
+    text = text.replace(r"\(", "$").replace(r"\)", "$")
+    return text
+
 def save_history(history_dict):
     """Saves the current chat history to a local file."""
     with open(SAVE_FILE, "w") as f:
@@ -287,7 +298,9 @@ for msg in st.session_state.messages[selected_character]:
     # If user, use silhouette. If AI, use their Wikipedia photo.
     avatar_choice = "👤" if msg["role"] == "user" else char_info["image"]
     with st.chat_message(msg["role"], avatar=avatar_choice):
-        st.markdown(msg["content"])
+        # APPLY THE CLEANUP FUNCTION HERE
+        safe_text = format_ai_math(msg["content"])
+        st.markdown(safe_text)
 
 # User Input
 if prompt := st.chat_input(f"Teach {char_info['base_name']} something new..."):
@@ -334,9 +347,13 @@ if prompt := st.chat_input(f"Teach {char_info['base_name']} something new..."):
                 temperature=0.7,
                 max_tokens=1000
             )
-            full_response = response.choices[0].message.content
+            raw_response = response.choices[0].message.content
+            
+            # APPLY THE CLEANUP FUNCTION HERE
+            full_response = format_ai_math(raw_response)
+            
             message_placeholder.markdown(full_response)
-
+            
         # SAFETY CHECK: Make sure we use 'selected_character' 
             if st.session_state.messages.get(selected_character) is None:
                    st.session_state.messages[selected_character] = []
