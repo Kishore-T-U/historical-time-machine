@@ -252,7 +252,7 @@ with st.sidebar:
                     )
                     prompt = f"Provide the birth and death years (format: YYYY-YYYY) and a 1-sentence biography for {new_name}. Format: \nDates: [Years]\nBio: [Biography]"
                     response = client.chat.completions.create(
-                        model="gpt-4o-mini",
+                        model="gpt-4o",
                         messages=[{"role": "user", "content": prompt}],
                         temperature=0.2, max_tokens=100
                     )
