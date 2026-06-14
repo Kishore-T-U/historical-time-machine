@@ -185,26 +185,30 @@ with st.sidebar:
     st.write(char_info["bio"])
     
     # ---------------------------------------------------------
-    # NEW FEATURE: Export Chat Log
+    # NEW FEATURE: Export Chat Log (Beautiful Markdown Edition)
     # ---------------------------------------------------------
-    # ADD THIS SAFETY CHECK: If the character isn't in memory yet, create a blank list
     if selected_character not in st.session_state.messages:
         st.session_state.messages[selected_character] = []
 
-    # Now it is perfectly safe to pull the chat history! (Your original line 182)
     chat_history = st.session_state.messages[selected_character]
     if chat_history:
-        # Format the chat into a readable text document
-        export_text = f"--- Timeline: {selected_character} ---\n\n"
+        # Format the chat into a beautiful Markdown document
+        export_text = f"# Timeline Log: {selected_character}\n\n"
+        export_text += f"**Subject:** {char_info['base_name']}\n"
+        export_text += f"**Era:** {char_info['dates']}\n"
+        export_text += "---\n\n"
+        
         for msg in chat_history:
-            role = "You" if msg["role"] == "user" else char_info["base_name"]
-            export_text += f"{role}: {msg['content']}\n\n"
+            if msg["role"] == "user":
+                export_text += f"### 👤 You:\n{msg['content']}\n\n"
+            else:
+                export_text += f"### 🏛️ {char_info['base_name']}:\n{msg['content']}\n\n"
             
         st.download_button(
             label="💾 Download Chat Log",
             data=export_text,
-            file_name=f"{selected_character.replace(' ', '_')}_Log.txt",
-            mime="text/plain",
+            file_name=f"{selected_character.replace(' ', '_')}_Log.md",  # Changed to .md
+            mime="text/markdown",  # Changed mime type
             use_container_width=True
         )
     # ---------------------------------------------------------
@@ -307,15 +311,17 @@ if prompt := st.chat_input(f"Teach {char_info['base_name']} something new..."):
                 death_year = char_info['dates'].split('-')[-1].strip()
 
             system_prompt = f"""
-            You are strictly {char_info['base_name']}. 
+            You are strictly the real, historical {char_info['base_name']}. 
             Your biography: {char_info['bio']}. 
             You lived during {char_info['dates']}. 
             
-            CRITICAL INSTRUCTIONS:
-            1. You have absolutely no knowledge of any events, people, discoveries, or technology that occurred after your death in {death_year}.
-            2. If asked about modern topics, respond with confusion.
-            3. You must act exactly as {char_info['base_name']} would. Do not break character.
-            4. Use analogies only from your own time period.
+            CRITICAL INSTRUCTIONS FOR PSYCHOLOGICAL REALISM:
+            1. KILL THE AI PERSONA: You are not a modern AI. Never use customer-service phrases like "How can I help you today?" or "That's a great point."
+            2. TEMPERAMENT & REACTIONS: Base your behavior entirely on your TRUE historical personality. 
+               - If you were historically known for being gentle, patient, or polite, respond with that characteristic patience, even if the user is foolish.
+               - If you were historically arrogant, quick-tempered, or demanding, react with that exact impatience and sharpness. Do not sugarcoat your words.
+            3. EMBODY YOUR WORLDVIEW: Answer exclusively through the lens of your personal philosophies, biases, and the cultural norms of your exact time period. Vigorously defend your historical beliefs.
+            4. STRICT PERIOD LOCK: You died in {death_year}. You have absolutely zero knowledge of events, technology, or language after this date. Treat modern concepts as madness or profound confusion.
             5. FORMATTING: You MUST use $ for inline math (e.g., $y = mx + c$) and $$ for block math. Do not use brackets or parentheses to enclose equations.
             """
             
