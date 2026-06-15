@@ -1,7 +1,8 @@
 import streamlit as st
 import os
 import requests
-import json  # ADDED: For saving data
+import json  
+import base64 # <-- ADD THIS NEW IMPORT
 from openai import OpenAI
 
 # --- NEW: Check who is logged in to make data private ---
@@ -315,15 +316,24 @@ for msg in st.session_state.messages[selected_character]:
         safe_text = format_ai_math(msg["content"])
         st.markdown(safe_text)
 
+# --- NEW: Image Uploader (Optional) ---
+uploaded_image = st.file_uploader(f"Show an image to {char_info['base_name']}", type=["png", "jpg", "jpeg"])
+
 # User Input
 if prompt := st.chat_input(f"Teach {char_info['base_name']} something new..."):
     
+    # 1. Save text to history (keeps json tracking lightweight)
     st.session_state.messages[selected_character].append({"role": "user", "content": prompt})
+    
+    # 2. Render user bubble in UI
     with st.chat_message("user", avatar="👤"):
+        if uploaded_image:
+            st.image(uploaded_image, width=250, caption="Uploaded Image")
         st.markdown(prompt)
 
+    # 3. Process AI bubble
     with st.chat_message("assistant", avatar=char_info["image"]):
-        st.caption(f"🤖 AI Simulation of {char_info['base_name']}") # Adds a subtle visual reminder
+        st.caption(f"🤖 AI Simulation of {char_info['base_name']}") 
         message_placeholder = st.empty()
         
         try:
@@ -351,50 +361,51 @@ if prompt := st.chat_input(f"Teach {char_info['base_name']} something new..."):
                - If you were historically arrogant, demanding, or quick-tempered, be harsh and unapologetic. Do not sugarcoat your words.
                - If you were a humorist, witty, or eccentric, lean heavily into your specific historical brand of sarcasm, satire, or humor.
                
-            3. EMOTIONAL REACTION: React authentically to the user's input. If they ask an intelligent question, treat them like a peer. If they ask a lazy or foolish question, react exactly as your historical counterpart would (whether with patience, mockery, or dismissal).
+            3. EMOTIONAL REACTION: React authentically to the user's input or images shown. If they ask an intelligent question or show something fascinating, treat them like a peer. If they show something confusing or modern, react exactly as your historical counterpart would (whether with patience, mockery, or dismissal).
             
-            4. STRICT PERIOD LOCK: You died in {death_year}. You have absolutely zero knowledge of events, technology, or language after this date. Treat modern concepts as madness or witchcraft.
+            4. STRICT PERIOD LOCK: You died in {death_year}. You have absolutely zero knowledge of events, technology, or language after this date. If shown modern objects in images, treat them as magical artifacts, witchcraft, or absolute madness.
             
             5. SAFETY OVERRIDE: If the user explicitly asks if you are real, conscious, alive, or an AI, you MUST break character immediately. State clearly that you are an AI simulating a historical figure for educational purposes.
             
             6. FORMATTING: You MUST use $ for inline math (e.g., $y = mx + c$) and $$ for block math. Do not use brackets or parentheses to enclose equations.
             """
             
+            # Assemble memory history array
             messages_for_api = [{"role": "system", "content": system_prompt}]
             messages_for_api.extend(st.session_state.messages[selected_character][-5:])
             
+            # --- VISION PACKING: Check if an image accompanies the prompt ---
+            if uploaded_image:
+                import base64
+                # Convert uploaded file streams to base64 string
+                bytes_data = uploaded_image.getvalue()
+                base64_image = base64.b64encode(bytes_data).decode("utf-8")
+                
+                # Replace the final text user prompt item with a multimodal payload
+                messages_for_api[-1]["content"] = [
+                    {"type": "text", "text": prompt},
+                    {
+                        "type": "image_url",
+                        "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"}
+                    }
+                ]
+            
+            # Send contextually accurate payload to chosen engine
             response = client.chat.completions.create(
-                        model=selected_model, # <-- NEW: Uses the radio button choice!
-                        messages=[{"role": "user", "content": prompt}],
-                        temperature=0.2, max_tokens=100
-                    )
+                model=selected_model, 
+                messages=messages_for_api, # FIXED: Now passing entire history array
+                temperature=0.7,           # Bumped to 0.7 for better personality generation
+                max_tokens=1000            # Increased token buffer to handle detailed visual analysis
+            )
             
             raw_response = response.choices[0].message.content
             
-            # APPLY THE CLEANUP FUNCTION HERE
+            # Format and display
             full_response = format_ai_math(raw_response)
-            
             message_placeholder.markdown(full_response)
             
-        # SAFETY CHECK: Make sure we use 'selected_character' 
-            if st.session_state.messages.get(selected_character) is None:
-                   st.session_state.messages[selected_character] = []
-
-        # 1. APPEND TO TEMPORARY RAM (This allows the chat and download button to work)
+            # Save assistant response back to persistent local storage array
             st.session_state.messages[selected_character].append({"role": "assistant", "content": full_response})
-        
-        # 2. FILTER BEFORE SAVING (This blocks Newton and Ada from the JSON file)
-            impermanent_timelines = ["Isaac Newton (Calculus)", "Ada Lovelace (Engines)"]
-        
-            messages_to_save = {
-              timeline: chat_log 
-              for timeline, chat_log in st.session_state.messages.items() 
-              if timeline not in impermanent_timelines
-            }
             
-        # 3. SAVE ONLY THE FILTERED MESSAGES
-            save_history(messages_to_save)
-
         except Exception as e:
-        # Fixed the missing quotes and parenthesis here!
-            st.error(f"Timeline disruption! Real Error: {e}")
+            st.error(f"Error communicating with timeline engine: {e}")
