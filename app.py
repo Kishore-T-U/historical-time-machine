@@ -55,7 +55,8 @@ def format_ai_math(text):
 # ---------------------------------------------------------
 # 2. PAGE CONFIGURATION & THEME
 # ---------------------------------------------------------
-st.set_page_config(page_title="Historical Time Machine", page_icon="⏳", layout="wide")
+st.set_page_config(page_title="Omni-Reality Communicator", page_icon="🌌", layout="wide") 
+# (You can also change the emoji icon to something cool like 🌌, ⚡, or 🛰️)
 
 # Inject Custom CSS for an "Ancient/Vintage" look
 st.markdown("""
@@ -205,7 +206,7 @@ st.markdown("""
 
 st.info("📱 **Mobile Users:** Avoid swiping down from the very top of your screen to prevent accidentally refreshing the page and resetting your timeline.")
 
-st.title("⏳ Historical Time Machine")
+st.title("🌌 Omni-Reality Communicator")
 st.write("Summon historical figures and explore different timelines!")
 
 # ---------------------------------------------------------
