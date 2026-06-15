@@ -1,4 +1,5 @@
 import streamlit as st
+import PyPDF2
 import os
 import requests
 import json  
@@ -154,8 +155,49 @@ st.markdown("""
         color: #e0e6ed !important;
     }
 
-    /* 10. FIX: Chat Input Text Color */
+    /* 10. FIX: Chat Input Background and Text Color */
+    [data-testid="stChatInput"] {
+        background-color: #1a2333 !important;
+        border-color: #3b82f6 !important;
+    }
+    [data-testid="stChatInput"] > div {
+        background-color: #1a2333 !important;
+    }
     [data-testid="stChatInput"] textarea {
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+        background-color: transparent !important;
+    }
+    
+    /* 11. AGGRESSIVE BUTTON & UPLOADER OVERRIDES */
+    
+    /* Form Submit Button (Open New Timeline) */
+    [data-testid="stFormSubmitButton"] > button {
+        background-color: #3b82f6 !important;
+        border: none !important;
+    }
+    [data-testid="stFormSubmitButton"] > button p {
+        color: #ffffff !important;
+        font-weight: bold !important;
+    }
+    
+    /* File Uploader Area */
+    [data-testid="stFileUploadDropzone"] {
+        background-color: #1a2333 !important;
+        border: 1px dashed #3b82f6 !important;
+    }
+    [data-testid="stFileUploadDropzone"] div, 
+    [data-testid="stFileUploadDropzone"] span, 
+    [data-testid="stFileUploadDropzone"] p {
+        color: #ffffff !important;
+    }
+    
+    /* The tiny 'Upload' button inside the dropzone */
+    button[data-testid="stBaseButton-secondary"] {
+        background-color: #1f2937 !important;
+        border: 1px solid #3b82f6 !important;
+    }
+    button[data-testid="stBaseButton-secondary"] p {
         color: #ffffff !important;
     }
 </style>
@@ -366,8 +408,7 @@ for msg in st.session_state.messages[selected_character]:
         safe_text = format_ai_math(msg["content"])
         st.markdown(safe_text)
 
-# Image Uploader Widget
-uploaded_image = st.file_uploader(f"Show an image to {char_info['base_name']}", type=["png", "jpg", "jpeg"])
+uploaded_file = st.file_uploader(f"Show a document or image to {char_info['base_name']}", type=["png", "jpg", "jpeg", "pdf"])
 
 # Chat Input & Logic
 if prompt := st.chat_input(f"Converse with {char_info['base_name']}..."):
@@ -376,8 +417,11 @@ if prompt := st.chat_input(f"Converse with {char_info['base_name']}..."):
     save_history(st.session_state.messages)
     
     with st.chat_message("user", avatar="👤"):
-        if uploaded_image:
-            st.image(uploaded_image, width=250, caption="Uploaded Image")
+        if uploaded_file:
+            if uploaded_file.name.lower().endswith('.pdf'):
+                st.caption(f"📄 Attached Document: {uploaded_file.name}")
+            else:
+                st.image(uploaded_file, width=250, caption="Uploaded Image")
         st.markdown(prompt)
 
     with st.chat_message("assistant", avatar=char_info["image"]):
@@ -417,16 +461,33 @@ if prompt := st.chat_input(f"Converse with {char_info['base_name']}..."):
             messages_for_api = [{"role": "system", "content": system_prompt}]
             messages_for_api.extend(st.session_state.messages[selected_character][-5:])
             
-            if uploaded_image:
-                bytes_data = uploaded_image.getvalue()
-                base64_image = base64.b64encode(bytes_data).decode("utf-8")
-                messages_for_api[-1]["content"] = [
-                    {"type": "text", "text": prompt},
-                    {
-                        "type": "image_url",
-                        "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"}
-                    }
-                ]
+            # Assemble memory history array
+            messages_for_api = [{"role": "system", "content": system_prompt}]
+            messages_for_api.extend(st.session_state.messages[selected_character][-5:])
+            
+            # --- NEW MULTIMODAL LOGIC (IMAGES & PDFS) ---
+            if uploaded_file:
+                # IF IT IS A PDF: Read the text and inject it into the prompt
+                if uploaded_file.name.lower().endswith('.pdf'):
+                    pdf_reader = PyPDF2.PdfReader(uploaded_file)
+                    extracted_text = ""
+                    for page in pdf_reader.pages:
+                        extracted_text += page.extract_text() + "\n"
+                    
+                    messages_for_api[-1]["content"] = f"{prompt}\n\n[USER PROVIDED DOCUMENT CONTENT:]\n{extracted_text}"
+                
+                # IF IT IS AN IMAGE: Do the Base64 Vision magic
+                else:
+                    bytes_data = uploaded_file.getvalue()
+                    base64_image = base64.b64encode(bytes_data).decode("utf-8")
+                    messages_for_api[-1]["content"] = [
+                        {"type": "text", "text": prompt},
+                        {
+                            "type": "image_url",
+                            "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"}
+                        }
+                    ]
+            # --------------------------------------------
             
             response = client.chat.completions.create(
                 model=selected_model, 
