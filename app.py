@@ -475,8 +475,8 @@ if prompt := st.chat_input(f"Converse with {char_info['base_name']}..."):
                     extracted_text = ""
                     for page in pdf_reader.pages:
                         extracted_text += page.extract_text() + "\n"
-                    
-                   messages_for_api[-1]["content"] = f"{prompt}\n\n[USER PROVIDED DOCUMENT CONTENT:]\n{extracted_text}\n\nCRITICAL: When answering questions about this document, base your answers SOLELY on the text provided above. If the document does not contain the answer, state that explicitly."
+                     
+                    messages_for_api[-1]["content"] = f"{prompt}\n\n[USER PROVIDED DOCUMENT CONTENT:]\n{extracted_text}\n\nCRITICAL: When answering questions about this document, base your answers SOLELY on the text provided above. If the document does not contain the answer, state that explicitly."
                 
                 # IF IT IS AN IMAGE: Do the Base64 Vision magic
                 else:
