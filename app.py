@@ -374,7 +374,7 @@ with st.sidebar:
                         model=selected_model, 
                         messages=[{"role": "user", "content": prompt}], # FIXED THIS BUG!
                         temperature=0.7,
-                        max_tokens=1000
+                        max_tokens=4096
                     )
                     
                     ai_data = response.choices[0].message.content
@@ -494,7 +494,7 @@ if prompt := st.chat_input(f"Converse with {char_info['base_name']}..."):
                 model=selected_model, 
                 messages=messages_for_api,
                 temperature=0.7,           
-                max_tokens=1000            
+                max_tokens=4096            
             )
             
             raw_response = response.choices[0].message.content
