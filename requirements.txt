@@ -4,3 +4,6 @@ requests
 streamlit-cookies-controller
 gTTS
 PyPDF2
+numpy
+sympy
+scipy
