@@ -137,6 +137,27 @@ st.markdown("""
     .stButton > button[kind="secondary"] p {
         color: #e0e6ed !important;
     }
+    /* 9. FIX: Download Buttons and Uploaders */
+    [data-testid="stDownloadButton"] button {
+        background-color: #1f2937 !important;
+        border: 1px solid #3b82f6 !important;
+    }
+    [data-testid="stDownloadButton"] button p, [data-testid="stDownloadButton"] button div {
+        color: #ffffff !important;
+    }
+    
+    [data-testid="stFileUploadDropzone"] {
+        background-color: #1a2333 !important;
+        border: 1px dashed #3b82f6 !important;
+    }
+    [data-testid="stFileUploadDropzone"] div, [data-testid="stFileUploadDropzone"] span, [data-testid="stFileUploadDropzone"] p {
+        color: #e0e6ed !important;
+    }
+
+    /* 10. FIX: Chat Input Text Color */
+    [data-testid="stChatInput"] textarea {
+        color: #ffffff !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -349,7 +370,7 @@ for msg in st.session_state.messages[selected_character]:
 uploaded_image = st.file_uploader(f"Show an image to {char_info['base_name']}", type=["png", "jpg", "jpeg"])
 
 # Chat Input & Logic
-if prompt := st.chat_input(f"Teach {char_info['base_name']} something new..."):
+if prompt := st.chat_input(f"Converse with {char_info['base_name']}..."):
     
     st.session_state.messages[selected_character].append({"role": "user", "content": prompt})
     save_history(st.session_state.messages)
