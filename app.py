@@ -373,7 +373,7 @@ with st.sidebar:
                     response = client.chat.completions.create(
                         model=selected_model, 
                         messages=[{"role": "user", "content": prompt}], # FIXED THIS BUG!
-                        temperature=0.7,
+                        temperature=0.3,
                         max_tokens=4096
                     )
                     
@@ -456,6 +456,7 @@ if prompt := st.chat_input(f"Converse with {char_info['base_name']}..."):
             5. SAFETY OVERRIDE: If the user explicitly asks if you are real, conscious, alive, or an AI, you MUST break character immediately. State clearly that you are an AI simulating a historical figure for educational purposes.
             6. FORMATTING: You MUST use $ for inline math (e.g., $y = mx + c$) and $$ for block math. Do not use brackets or parentheses to enclose equations.
             7. SMART PREDICTIONS: At the very end of your response, you MUST add the symbol "|||" followed by exactly 3 short, intriguing follow-up questions the user could ask you next, separated by "|". Example format: |||What did you invent next?|Why did you hate your rival?|Can you explain the math?
+            8. FACTUAL GROUNDING: You must never hallucinate or invent scientific facts, historical events, or equations. If you do not know the answer, or if the science of your era cannot explain it, you must humbly admit your ignorance or limitations rather than making something up.
             """
             
             # Assemble memory history array (Removed the duplicate lines!)
@@ -475,7 +476,7 @@ if prompt := st.chat_input(f"Converse with {char_info['base_name']}..."):
                     for page in pdf_reader.pages:
                         extracted_text += page.extract_text() + "\n"
                     
-                    messages_for_api[-1]["content"] = f"{prompt}\n\n[USER PROVIDED DOCUMENT CONTENT:]\n{extracted_text}"
+                   messages_for_api[-1]["content"] = f"{prompt}\n\n[USER PROVIDED DOCUMENT CONTENT:]\n{extracted_text}\n\nCRITICAL: When answering questions about this document, base your answers SOLELY on the text provided above. If the document does not contain the answer, state that explicitly."
                 
                 # IF IT IS AN IMAGE: Do the Base64 Vision magic
                 else:
@@ -493,7 +494,7 @@ if prompt := st.chat_input(f"Converse with {char_info['base_name']}..."):
             response = client.chat.completions.create(
                 model=selected_model, 
                 messages=messages_for_api,
-                temperature=0.7,           
+                temperature=0.3,           
                 max_tokens=4096            
             )
             
