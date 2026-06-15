@@ -1,3 +1,6 @@
+import re
+import sys
+from io import StringIO
 import streamlit as st
 import PyPDF2
 import os
@@ -473,6 +476,7 @@ if prompt := st.chat_input(f"Converse with {char_info['base_name']}..."):
             6. FORMATTING: You MUST use $ for inline math (e.g., $y = mx + c$) and $$ for block math. Do not use brackets or parentheses to enclose equations.
             7. SMART PREDICTIONS: At the very end of your response, you MUST add the symbol "|||" followed by exactly 3 short, intriguing follow-up questions the user could ask you next, separated by "|".
             8. FACTUAL GROUNDING: You must never hallucinate or invent scientific facts or historical events. If you do not know the answer, you must humbly admit your ignorance rather than making something up.
+            9. THE MATHEMATICAL SANDBOX: If the user asks you to solve a complex numerical problem, graph a trajectory, or perform heavy computations (like integrals, matrices, or physics simulations), you MUST write a Python script using 'numpy' or 'sympy' to solve it. Output the script inside a standard ```python ``` markdown block. Always include 'print()' statements in your code so the user can see the final numerical answers.
             """
             
             # Assemble memory history array (Removed the duplicate lines!)
@@ -529,6 +533,37 @@ if prompt := st.chat_input(f"Converse with {char_info['base_name']}..."):
             # Display ONLY the main text
             full_response = format_ai_math(main_text)
             message_placeholder.markdown(full_response)
+            
+            # --- NEW: THE SCI-PY EXECUTION SANDBOX ---
+            # Search the AI's response for Python code blocks
+            code_blocks = re.findall(r'```python\n(.*?)\n```', full_response, re.DOTALL)
+            
+            if code_blocks:
+                st.markdown("### ⚙️ Executable Simulation Detected")
+                
+                # We only grab the first code block for safety
+                code_to_run = code_blocks[0] 
+                
+                if st.button("▶️ Run Simulation", type="primary", use_container_width=True):
+                    with st.spinner("Executing mathematical model..."):
+                        # Capture the printed output from the code
+                        old_stdout = sys.stdout
+                        redirected_output = sys.stdout = StringIO()
+                        
+                        try:
+                            # Execute the code block live!
+                            exec(code_to_run)
+                            
+                            st.success("Simulation Complete:")
+                            # Display whatever the code 'printed'
+                            st.code(redirected_output.getvalue(), language="text")
+                            
+                        except Exception as script_error:
+                            st.error(f"Simulation Failed: {script_error}")
+                        finally:
+                            # Reset the system output
+                            sys.stdout = old_stdout
+            # -----------------------------------------
             
             
             # Display the Smart Predictions UI
