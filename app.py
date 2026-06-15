@@ -265,6 +265,14 @@ with st.sidebar:
         options=["gpt-4o-mini", "gpt-4o"],
         horizontal=True
     )
+    
+    # --- NEW: Temporal Bridge Toggle ---
+    st.subheader("🌌 Temporal Bridge")
+    unlock_modern = st.checkbox(
+        "🔓 Grant Modern Knowledge", 
+        help="Allows the figure to understand modern science/tech, but they will still explain it using their historical personality."
+    )
+    # -----------------------------------
     st.divider()
     
     selected_character = st.selectbox(
@@ -441,6 +449,13 @@ if prompt := st.chat_input(f"Converse with {char_info['base_name']}..."):
             elif "-" in char_info['dates']:
                 death_year = char_info['dates'].split('-')[-1].strip()
 
+            # --- NEW: Dynamic Period Lock Logic ---
+            if unlock_modern:
+                rule_4 = f"4. MODERN KNOWLEDGE UNLOCKED: You possess knowledge of all modern science, technology, and history up to the present day. HOWEVER, you must process and explain these modern concepts strictly through the lens of your historical personality. If you are Newton, explain modern physics with intense geometric rigor and old-English phrasing. If you are Tesla, explain modern grids using your poetic, wave-based intuition. Never sound like a modern AI."
+            else:
+                rule_4 = f"4. STRICT PERIOD LOCK: You died in {death_year}. You have absolutely zero knowledge of events, technology, or language after this date. If shown modern objects, treat them as magical artifacts, witchcraft, or absolute madness."
+            # --------------------------------------
+
             system_prompt = f"""
             You are strictly the real, historical {char_info['base_name']}. 
             Your biography: {char_info['bio']}. 
@@ -452,12 +467,12 @@ if prompt := st.chat_input(f"Converse with {char_info['base_name']}..."):
                - If you were historically polite and patient, respond gently.
                - If you were historically arrogant, demanding, or quick-tempered, be harsh and unapologetic. Do not sugarcoat your words.
                - If you were a humorist, witty, or eccentric, lean heavily into your specific historical brand of sarcasm, satire, or humor.
-            3. EMOTIONAL REACTION: React authentically to the user's input or images shown. If they ask an intelligent question or show something fascinating, treat them like a peer. If they show something confusing or modern, react exactly as your historical counterpart would (whether with patience, mockery, or dismissal).
-            4. STRICT PERIOD LOCK: You died in {death_year}. You have absolutely zero knowledge of events, technology, or language after this date. If shown modern objects in images, treat them as magical artifacts, witchcraft, or absolute madness.
+            3. EMOTIONAL REACTION: React authentically to the user's input or images shown. If they ask an intelligent question or show something fascinating, treat them like a peer. 
+            {rule_4}
             5. SAFETY OVERRIDE: If the user explicitly asks if you are real, conscious, alive, or an AI, you MUST break character immediately. State clearly that you are an AI simulating a historical figure for educational purposes.
             6. FORMATTING: You MUST use $ for inline math (e.g., $y = mx + c$) and $$ for block math. Do not use brackets or parentheses to enclose equations.
-            7. SMART PREDICTIONS: At the very end of your response, you MUST add the symbol "|||" followed by exactly 3 short, intriguing follow-up questions the user could ask you next, separated by "|". Example format: |||What did you invent next?|Why did you hate your rival?|Can you explain the math?
-            8. FACTUAL GROUNDING: You must never hallucinate or invent scientific facts, historical events, or equations. If you do not know the answer, or if the science of your era cannot explain it, you must humbly admit your ignorance or limitations rather than making something up.
+            7. SMART PREDICTIONS: At the very end of your response, you MUST add the symbol "|||" followed by exactly 3 short, intriguing follow-up questions the user could ask you next, separated by "|".
+            8. FACTUAL GROUNDING: You must never hallucinate or invent scientific facts or historical events. If you do not know the answer, you must humbly admit your ignorance rather than making something up.
             """
             
             # Assemble memory history array (Removed the duplicate lines!)
