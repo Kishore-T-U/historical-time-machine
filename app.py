@@ -184,6 +184,17 @@ if "messages" not in st.session_state:
 with st.sidebar:
     st.header("🕰️ Timeline Control")
     
+    # --- NEW: Model Switcher ---
+    st.subheader("⚙️ AI Engine Control")
+    st.caption("Switch engines if you hit a temporal rate limit.")
+    selected_model = st.radio(
+        "Active Model:",
+        options=["gpt-4o-mini", "gpt-4o"],
+        horizontal=True
+    )
+    st.divider()
+    # ---------------------------
+    
     selected_character = st.selectbox(
         "Select an active timeline:", 
         options=list(st.session_state.personas.keys())
@@ -267,10 +278,12 @@ with st.sidebar:
                     )
                     prompt = f"Provide the birth and death years (format: YYYY-YYYY) and a 1-sentence biography for {new_name}. Format: \nDates: [Years]\nBio: [Biography]"
                     response = client.chat.completions.create(
-                        model="gpt-4o",
-                        messages=[{"role": "user", "content": prompt}],
-                        temperature=0.2, max_tokens=100
+                        model=selected_model, # <-- NEW: Uses the radio button choice!
+                        messages=messages_for_api,
+                        temperature=0.7,
+                        max_tokens=1000
                     )
+                    
                     ai_data = response.choices[0].message.content
                     final_dates = ai_data.split("Dates:")[1].split("\n")[0].strip() if "Dates:" in ai_data else "Unknown"
                     final_bio = ai_data.split("Bio:")[1].strip() if "Bio:" in ai_data else "A figure from history."
@@ -351,11 +364,11 @@ if prompt := st.chat_input(f"Teach {char_info['base_name']} something new..."):
             messages_for_api.extend(st.session_state.messages[selected_character][-5:])
             
             response = client.chat.completions.create(
-                model="gpt-4o",
-                messages=messages_for_api,
-                temperature=0.7,
-                max_tokens=1000
-            )
+                        model=selected_model, # <-- NEW: Uses the radio button choice!
+                        messages=[{"role": "user", "content": prompt}],
+                        temperature=0.2, max_tokens=100
+                    )
+            
             raw_response = response.choices[0].message.content
             
             # APPLY THE CLEANUP FUNCTION HERE
