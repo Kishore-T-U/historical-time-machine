@@ -24,14 +24,26 @@ def load_history():
     return {} 
 
 def format_ai_math(text):
-    """
-    Cleans up stubborn AI math formatting so Streamlit's native KaTeX 
-    engine renders it perfectly every time.
-    """
-    # Replace block math brackets with double dollar signs
+    # --- NEW FIX: Handle Image/Multimodal Lists ---
+    # If the text is actually a list (because an image was uploaded), 
+    # extract just the text portion so we don't crash.
+    if isinstance(text, list):
+        extracted_text = ""
+        for item in text:
+            if isinstance(item, dict) and item.get("type") == "text":
+                extracted_text = item.get("text", "")
+                break
+        text = extracted_text
+        
+    # Safety net: force it to be a string
+    if not isinstance(text, str):
+        text = str(text)
+    # ----------------------------------------------
+
+    # Your original replace logic continues here...
     text = text.replace(r"\[", "$$").replace(r"\]", "$$")
-    # Replace inline math brackets with single dollar signs
     text = text.replace(r"\(", "$").replace(r"\)", "$")
+    
     return text
 
 def save_history(history_dict):
@@ -206,6 +218,33 @@ with st.sidebar:
     st.subheader(char_info["base_name"])
     st.caption(char_info["dates"])
     st.write(char_info["bio"])
+
+    st.divider()
+    st.subheader("💾 Time Capsule (Save/Load)")
+    st.caption("Save your timelines to your device to resume later.")
+
+    # 1. DOWNLOAD SAVE FILE (The JSON State)
+    import json
+    save_data = json.dumps(st.session_state.messages, indent=4)
+    st.download_button(
+        label="⬇️ Download Save Data",
+        data=save_data,
+        file_name="time_capsule_save.json",
+        mime="application/json",
+        use_container_width=True
+    )
+
+    # 2. UPLOAD SAVE FILE (Restore the State)
+    uploaded_save = st.file_uploader("⬆️ Load Previous Save", type=["json"])
+    if uploaded_save is not None:
+        if st.button("Restore Timelines", use_container_width=True):
+            try:
+                loaded_data = json.load(uploaded_save)
+                st.session_state.messages = loaded_data
+                st.success("Timelines successfully restored! ⏳")
+                st.rerun()
+            except Exception:
+                st.error("Corrupted timeline file!")
     
     # ---------------------------------------------------------
     # NEW FEATURE: Export Chat Log (Beautiful Markdown Edition)
