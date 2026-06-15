@@ -1,5 +1,3 @@
-from gtts import gTTS
-import io
 import streamlit as st
 import os
 import requests
@@ -61,59 +59,83 @@ st.set_page_config(page_title="Historical Time Machine", page_icon="⏳", layout
 # Inject Custom CSS for an "Ancient/Vintage" look
 st.markdown("""
 <style>
+    /* 1. Omni Dark Multiverse Background */
     .stApp {
-        background-color: #f4ecd8;
-        background-image: url("https://www.transparenttextures.com/patterns/aged-paper.png");
-        font-family: 'Georgia', serif !important;
+        background-color: #0b0f19; /* Deep space dark blue/black */
+        color: #e0e6ed !important;
+        font-family: 'Inter', 'Segoe UI', sans-serif !important;
     }
+
+    /* 2. Base Text Colors */
     .stApp p, .stApp span, .stApp label, .stApp li {
-        color: #2b1b17 !important;
+        color: #e0e6ed !important;
     }
+    
     h1, h2, h3 {
-        font-family: 'Georgia', serif !important;
-        color: #3e2723 !important;
+        font-family: 'Inter', 'Segoe UI', sans-serif !important;
+        color: #ffffff !important;
+        letter-spacing: 1px;
     }
+
+    /* 3. Sleek Dropdowns */
     div[data-baseweb="select"] > div {
-        background-color: #f4ecd8 !important;
-        border: 1px solid #8d6e63 !important;
-        color: #2b1b17 !important;
+        background-color: #1a2333 !important;
+        border: 1px solid #3b82f6 !important; /* Omni Blue Accent */
+        color: #ffffff !important;
     }
     div[data-baseweb="popover"] div {
-        background-color: #f4ecd8 !important;
-        color: #2b1b17 !important;
+        background-color: #1a2333 !important;
+        color: #ffffff !important;
     }
+
+    /* 4. Omni Chat Bubbles */
     [data-testid="stChatMessage"] {
-        background-color: #ede6d3 !important;
-        border: 1px solid #cbbba0 !important; 
-        border-radius: 10px !important;       
+        background-color: #131b2b !important;
+        border: 1px solid #2d3748 !important; 
+        border-radius: 12px !important;       
         margin-bottom: 15px !important;       
         padding: 15px !important;
-        box-shadow: 2px 2px 5px rgba(43, 27, 23, 0.08) !important; 
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important; 
     }
+
+    /* 5. Sidebar Styling */
     [data-testid="stSidebar"] {
-        background-color: #e6dfcc;
-        border-right: 2px solid #8d6e63;
+        background-color: #0d131f;
+        border-right: 1px solid #1f2937;
     }
+
+    /* 6. Chat Input */
     [data-testid="stChatInput"] {
-        background-color: #e6dfcc !important;
-        border: 1px solid #8d6e63 !important;
+        background-color: #1a2333 !important;
+        border: 1px solid #3b82f6 !important;
     }
+
+    /* 7. Header Fixes */
     [data-testid="stHeader"], [data-testid="stBottom"] > div {
         background-color: transparent !important;
     }
     [data-testid="collapsedControl"] svg, [data-testid="collapsedControl"] {
-        color: #2b1b17 !important;
-        fill: #2b1b17 !important;
+        color: #ffffff !important;
+        fill: #ffffff !important;
+    }
+
+    /* 8. Omni Buttons */
+    .stButton > button[kind="primary"] {
+        background-color: #3b82f6 !important;
+        border: none !important;
+        border-radius: 6px !important;
     }
     .stButton > button[kind="primary"] p {
-        color: #f4ecd8 !important;
+        color: #ffffff !important;
+        font-weight: bold;
     }
     .stButton > button[kind="secondary"] {
-        background-color: #e6dfcc !important;
-        border: 1px solid #8d6e63 !important;
+        background-color: #1f2937 !important;
+        border: 1px solid #374151 !important;
+        border-radius: 6px !important;
     }
     .stButton > button[kind="secondary"] p {
-        color: #2b1b17 !important;
+        color: #e0e6ed !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -408,16 +430,6 @@ if prompt := st.chat_input(f"Teach {char_info['base_name']} something new..."):
             full_response = format_ai_math(main_text)
             message_placeholder.markdown(full_response)
             
-            # Generate Voice Output
-            with st.spinner("Generating temporal audio..."):
-                try:
-                    tld = "co.uk" if char_info.get("nationality") == "British" else "com"
-                    tts = gTTS(text=full_response, lang='en', tld=tld)
-                    audio_bytes = io.BytesIO()
-                    tts.write_to_fp(audio_bytes)
-                    st.audio(audio_bytes, format='audio/mp3')
-                except Exception as e:
-                    st.caption("Audio generation failed for this transmission.")
             
             # Display the Smart Predictions UI
             if len(suggestions) >= 3:
