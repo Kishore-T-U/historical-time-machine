@@ -458,12 +458,13 @@ if prompt := st.chat_input(f"Converse with {char_info['base_name']}..."):
             7. SMART PREDICTIONS: At the very end of your response, you MUST add the symbol "|||" followed by exactly 3 short, intriguing follow-up questions the user could ask you next, separated by "|". Example format: |||What did you invent next?|Why did you hate your rival?|Can you explain the math?
             """
             
+            # Assemble memory history array (Removed the duplicate lines!)
             messages_for_api = [{"role": "system", "content": system_prompt}]
-            messages_for_api.extend(st.session_state.messages[selected_character][-5:])
             
-            # Assemble memory history array
-            messages_for_api = [{"role": "system", "content": system_prompt}]
-            messages_for_api.extend(st.session_state.messages[selected_character][-5:])
+            # --- THE FIX: Use deepcopy so we don't bloat the saved JSON file! ---
+            import copy
+            history_copy = copy.deepcopy(st.session_state.messages[selected_character][-5:])
+            messages_for_api.extend(history_copy)
             
             # --- NEW MULTIMODAL LOGIC (IMAGES & PDFS) ---
             if uploaded_file:
