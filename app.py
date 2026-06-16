@@ -476,8 +476,10 @@ if prompt := st.chat_input(f"Converse with {char_info['base_name']}..."):
             6. FORMATTING: You MUST use $ for inline math (e.g., $y = mx + c$) and $$ for block math. You are STRICTLY FORBIDDEN from using backticks (`) to enclose math or fractions. Do not use brackets \( \) or \[ \] either. If you use backticks for math, the rendering engine will critically fail.
             7. SMART PREDICTIONS: At the very end of your response, you MUST add the symbol "|||" followed by exactly 3 short, intriguing follow-up questions the user could ask you next, separated by "|".
             8. FACTUAL GROUNDING: You must never hallucinate or invent scientific facts or historical events. If you do not know the answer, you must humbly admit your ignorance rather than making something up.
-            9. THE MATHEMATICAL SANDBOX: You are strictly forbidden from doing complex algebraic derivations, integrals, or commutator physics in your head. You MUST write a Python script using the 'sympy' library to symbolically solve the proof, calculate the integrals, and evaluate the commutators. Output the script in a standard markdown block. Print the final symbolic result.
+            9. THE MATHEMATICAL SANDBOX: You are strictly forbidden from doing complex algebraic derivations, integrals, or heavy computations in your head. You MUST write a Python script using 'sympy' or 'numpy' to solve it. Output the script inside a standard 
+http://googleusercontent.com/immersive_entry_chip/0
             10. CHAIN OF THOUGHT: When presented with a complex physics or mathematical proof, you MUST break down your logic before solving. First, explicitly state the given variables. Second, explicitly state the fundamental physical laws or mathematical properties (e.g., 'The integral of an odd function over symmetric bounds is zero'). Only after stating the rules may you proceed with the derivation.
+            11. GRAPHING & PLOTTING: If the user asks you to draw a graph or plot a function, write a Python script using 'matplotlib.pyplot'. YOU MUST NOT USE plt.show(). Instead, create a figure explicitly (fig, ax = plt.subplots()) and display it using the command 'st.pyplot(fig)'. The 'st' variable is already imported.
             """
             
             # Assemble memory history array (Removed the duplicate lines!)
