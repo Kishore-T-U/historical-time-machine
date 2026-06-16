@@ -457,6 +457,7 @@ if prompt := st.chat_input(f"Converse with {char_info['base_name']}..."):
     
     st.session_state.messages[selected_character].append({"role": "user", "content": prompt})
     save_history(st.session_state.messages)
+    st.rerun()
     
     with st.chat_message("user", avatar="👤"):
         if uploaded_file:
@@ -509,7 +510,7 @@ if prompt := st.chat_input(f"Converse with {char_info['base_name']}..."):
             9. THE MATHEMATICAL SANDBOX: You are strictly forbidden from doing complex algebraic derivations, integrals, or heavy computations in your head. You MUST write a Python script using 'sympy' or 'numpy' to solve it. Output the script inside a standard 
 http://googleusercontent.com/immersive_entry_chip/0
             10. CHAIN OF THOUGHT: When presented with a complex physics or mathematical proof, you MUST break down your logic before solving. First, explicitly state the given variables. Second, explicitly state the fundamental physical laws or mathematical properties (e.g., 'The integral of an odd function over symmetric bounds is zero'). Only after stating the rules may you proceed with the derivation.
-            11. GRAPHING & PLOTTING: If the user asks you to draw a graph or plot a function, write a Python script using 'matplotlib.pyplot'. YOU MUST NOT USE plt.show(). Instead, create a figure explicitly (fig, ax = plt.subplots()) and display it using the command 'st.pyplot(fig)'. The 'st' variable is already imported.
+            11. INTERACTIVE GRAPHING: If the user asks you to draw a graph, plot a function, or visualize data, you MUST write a Python script using the 'plotly.graph_objects' or 'plotly.express' libraries. You are strictly forbidden from using matplotlib. YOU MUST NOT use fig.show(). Instead, you must display the interactive figure by calling 'st.plotly_chart(fig)'. The 'st' variable is already imported.
             """
             
             # Assemble memory history array (Removed the duplicate lines!)
