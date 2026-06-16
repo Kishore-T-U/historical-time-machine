@@ -414,11 +414,41 @@ with st.sidebar:
 st.header(f"Chatting with {char_info['base_name']}")
 
 # Render Chat History
-for msg in st.session_state.messages[selected_character]:
+for i, msg in enumerate(st.session_state.messages[selected_character]):
     avatar_choice = "👤" if msg["role"] == "user" else char_info["image"]
     with st.chat_message(msg["role"], avatar=avatar_choice):
         safe_text = format_ai_math(msg["content"])
         st.markdown(safe_text)
+        
+        # --- THE SCI-PY EXECUTION SANDBOX (Moved to History Loop!) ---
+        if msg["role"] == "assistant":
+            code_blocks = re.findall(r'```python\n(.*?)\n```', msg["content"], re.DOTALL)
+            if code_blocks:
+                st.markdown("### ⚙️ Executable Simulation Detected")
+                code_to_run = code_blocks[-1] # Run the most recent code block
+                
+                # Streamlit buttons in a loop need a unique 'key'
+                if st.button("▶️ Run Simulation", key=f"run_sim_{i}", type="primary", use_container_width=True):
+                    with st.spinner("Executing mathematical model..."):
+                        old_stdout = sys.stdout
+                        redirected_output = sys.stdout = StringIO()
+                        
+                        try:
+                            # Pass 'st' into the sandbox so the AI can use st.pyplot()!
+                            exec(code_to_run, {"st": st})
+                            
+                            st.success("Simulation Complete!")
+                            
+                            # Print any text output if the code used print()
+                            output = redirected_output.getvalue()
+                            if output.strip():
+                                st.code(output, language="text")
+                                
+                        except Exception as script_error:
+                            st.error(f"Simulation Failed: {script_error}")
+                        finally:
+                            sys.stdout = old_stdout
+        # -----------------------------------------------------------
 
 uploaded_file = st.file_uploader(f"Show a document or image to {char_info['base_name']}", type=["png", "jpg", "jpeg", "pdf"])
 
@@ -538,36 +568,6 @@ http://googleusercontent.com/immersive_entry_chip/0
             message_placeholder.markdown(full_response)
             
             # --- NEW: THE SCI-PY EXECUTION SANDBOX ---
-            # Search the AI's response for Python code blocks
-            code_blocks = re.findall(r'```python\n(.*?)\n```', full_response, re.DOTALL)
-            
-            if code_blocks:
-                st.markdown("### ⚙️ Executable Simulation Detected")
-                
-                # We only grab the first code block for safety
-                code_to_run = code_blocks[0] 
-                
-                if st.button("▶️ Run Simulation", type="primary", use_container_width=True):
-                    with st.spinner("Executing mathematical model..."):
-                        # Capture the printed output from the code
-                        old_stdout = sys.stdout
-                        redirected_output = sys.stdout = StringIO()
-                        
-                        try:
-                            # Execute the code block live!
-                            exec(code_to_run)
-                            
-                            st.success("Simulation Complete:")
-                            # Display whatever the code 'printed'
-                            st.code(redirected_output.getvalue(), language="text")
-                            
-                        except Exception as script_error:
-                            st.error(f"Simulation Failed: {script_error}")
-                        finally:
-                            # Reset the system output
-                            sys.stdout = old_stdout
-            # -----------------------------------------
-            
             
             # Display the Smart Predictions UI
             if len(suggestions) >= 3:
