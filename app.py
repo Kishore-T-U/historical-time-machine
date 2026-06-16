@@ -457,7 +457,7 @@ if prompt := st.chat_input(f"Converse with {char_info['base_name']}..."):
     
     st.session_state.messages[selected_character].append({"role": "user", "content": prompt})
     save_history(st.session_state.messages)
-    st.rerun()
+    #st.rerun()
     
     with st.chat_message("user", avatar="👤"):
         if uploaded_file:
