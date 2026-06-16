@@ -8,3 +8,4 @@ numpy
 sympy
 scipy
 matplotlib
+plotly
