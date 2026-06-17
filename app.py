@@ -9,6 +9,12 @@ import json
 import base64
 from openai import OpenAI
 
+# --- NEW: GLOBAL API CLIENT ---
+client = OpenAI(
+    base_url="https://models.inference.ai.azure.com",
+    api_key=os.environ.get("GITHUB_TOKEN")
+)
+
 # ---------------------------------------------------------
 # 1. USER ISOLATION & LOCAL STORAGE
 # ---------------------------------------------------------
@@ -409,10 +415,6 @@ with st.sidebar:
                 final_image = custom_image.strip() if custom_image.strip() else get_wikipedia_image(new_name)
                 
                 try:
-                    client = OpenAI(
-                        base_url="https://models.inference.ai.azure.com",
-                        api_key=os.environ.get("GITHUB_TOKEN")
-                    )
                     prompt = f"Provide the birth and death years (format: YYYY-YYYY) and a 1-sentence biography for {new_name}. Format: \nDates: [Years]\nBio: [Biography]"
                     response = client.chat.completions.create(
                         model=selected_model, 
@@ -504,11 +506,6 @@ if prompt := st.chat_input(f"Converse with {char_info['base_name']}..."):
         message_placeholder = st.empty()
         
         try:
-            client = OpenAI(
-                base_url="https://models.inference.ai.azure.com",
-                api_key=os.environ.get("GITHUB_TOKEN")
-            )
-            
             death_year = "your time"
             if "–" in char_info['dates']:
                 death_year = char_info['dates'].split('–')[-1].strip()
