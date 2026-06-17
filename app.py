@@ -286,21 +286,17 @@ with st.sidebar:
                 Format as a clean bulleted list. 
                 Include the name and exactly one short sentence explaining why they are the perfect mentor for this.
                 """
+                # Remove the 'try:' line
+                match_response = client.chat.completions.create(
+                    model="gpt-4o-mini", 
+                    messages=[{"role": "user", "content": matchmaker_prompt}],
+                    temperature=0.5
+                )
                 
-                try:
-                    # Make a fast, cheap API call using the mini model
-                    # (Ensure your client variable matches what you named it at the top of your script!)
-                    match_response = client.chat.completions.create(
-                        model="gpt-4o-mini", 
-                        messages=[{"role": "user", "content": matchmaker_prompt}],
-                        temperature=0.5
-                    )
-                    
-                    st.success("Match Found:")
-                    st.markdown(match_response.choices[0].message.content)
-                    
-                except Exception as e:
-                    st.error("Timeline disruption. Could not fetch mentors.")
+                st.success("Match Found:")
+                st.markdown(match_response.choices[0].message.content)
+                
+                # Remove the 'except Exception as e:' and the st.error line entirely
         else:
             st.warning("Please enter a subject first!")
     # --------------------------------
