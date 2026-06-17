@@ -268,6 +268,42 @@ with st.sidebar:
         options=["gpt-4o-mini", "gpt-4o"],
         horizontal=True
     )
+
+    # --- NEW: MENTOR MATCHMAKER ---
+    st.divider()
+    st.subheader("🔮 Mentor Matchmaker")
+    st.caption("Don't know who to talk to? Let the archives decide.")
+    
+    study_subject = st.text_input("Enter a subject or course:", placeholder="e.g., Quantum Physics, C++, Stoicism")
+    
+    if st.button("Find Experts", use_container_width=True):
+        if study_subject:
+            with st.spinner("Scanning timelines..."):
+                # Create a specific prompt just for finding names
+                matchmaker_prompt = f"""
+                The user wants to study '{study_subject}'. 
+                Recommend exactly 5 figures (historical, mythical, or highly accurate fictional) who are absolute masters of this topic. 
+                Format as a clean bulleted list. 
+                Include the name and exactly one short sentence explaining why they are the perfect mentor for this.
+                """
+                
+                try:
+                    # Make a fast, cheap API call using the mini model
+                    # (Ensure your client variable matches what you named it at the top of your script!)
+                    match_response = client.chat.completions.create(
+                        model="gpt-4o-mini", 
+                        messages=[{"role": "user", "content": matchmaker_prompt}],
+                        temperature=0.5
+                    )
+                    
+                    st.success("Match Found:")
+                    st.markdown(match_response.choices[0].message.content)
+                    
+                except Exception as e:
+                    st.error("Timeline disruption. Could not fetch mentors.")
+        else:
+            st.warning("Please enter a subject first!")
+    # --------------------------------
     
     # --- NEW: Temporal Bridge Toggle ---
     st.subheader("🌌 Temporal Bridge")
